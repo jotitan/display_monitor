@@ -1,0 +1,133 @@
+<html>
+<head>
+   <script type="application/javascript" src="jquery-2.1.3.min.js"></script>
+   <!--link rel="stylesheet" href="css/bootstrap.min.css"-->
+</head>
+
+<body>
+
+<style>
+
+body {
+   background-color:black;
+   margin:0px;
+    overflow:hidden;
+}
+
+   .clock {
+      color:white;
+      text-align:center;
+   }
+
+   .date {
+       font-variant: small-caps;
+       font-size: 20px;
+       font-family: fantasy;
+   }
+
+   .hm {
+      font-size:80px;
+      font-family: fantasy;
+   }
+
+   .seconds {
+      font-size:30px;
+      font-family: fantasy;
+      display:inline-block;
+      width:50px;
+   }
+
+    .gallery {
+        text-align:center;
+    }
+
+    .gallery img {
+
+    }
+
+    #idWarning {
+        display:none;
+        position:absolute;
+        padding:10px;
+        text-align:center;left:calc(50% - 100px);width:200px;
+        height:120px;
+        font-weight: bold;
+        top:calc(50% - 60px);
+        border:solid 2px white;
+        color:white;
+        font-size: 18px;
+        background-color:gray
+    }
+
+    .folderName {
+        font-variant:small-caps;
+        padding:5px;
+        font-size:18px;
+        color:white;
+        cursor:pointer;
+    }
+</style>
+<!-- TODO : levee et coucher de soleil / lune. Sondes -->
+
+   <div style="width:79%;float:left;position:relative" class="gallery">
+       <div style="position:absolute;text-align:center;width:100%">
+        <img src=""/>
+       </div>
+       <div style="position:absolute;text-align:center;width:100%">
+        <img src="" style="opacity:0;">
+       </div>
+   </div>
+
+
+
+   <div style="width:20%;float:right;position:relative;margin-left:5px;background-color:black">
+      <div class="clock">
+         <div class="time">
+            <span class="hm"></span> <span class="seconds"></span>
+         </div>
+         <div class="date"></div>
+      </div>
+
+      <div class="planet" style="text-align:center">
+          <img src="" class="earth" style="width:95%"/>
+          <img src="" class="moon" style="width:75%"/>
+      </div>
+   </div>
+<div style="position:absolute;bottom:0px;right:0px;width:20%;" class="meteo">
+    <div id="widget_e51c7a153a96e46f31cafc3b97dc885c">
+        <span id="t_e51c7a153a96e46f31cafc3b97dc885c"></span>
+        <span id="l_e51c7a153a96e46f31cafc3b97dc885c"><a href="http://www.my-meteo.fr/previsions+meteo+france/paris.html"></a></span>
+        <script type="text/javascript">
+                    (function() {
+                        var my = document.createElement("script"); my.type = "text/javascript"; my.async = true;
+                        my.src = "http://services.my-meteo.fr/widget/js3.php?ville=251&format=petit-horizontal&nb_jours=3&icones&horaires&c1=ffffff&c2=ffffff&c3=000000&c4=000000&c5=00d2ff&c6=ffc334&police=0&t_icones=1&x=422&y=56&id=e51c7a153a96e46f31cafc3b97dc885c";
+                        var z = document.getElementsByTagName("script")[0]; z.parentNode.insertBefore(my, z);
+                    })();
+        </script>
+
+    </div>
+</div>
+
+
+<div style="position:absolute;bottom:0px;text-align:left;z-index:1">
+    <span class="folderName"></span>
+</div>
+
+<div style="position:absolute;bottom:0px;width:79%;text-align:right">
+    <iframe src="http://192.168.0.18:9004/html/remote_control.html" height="40px" width="90%" frameborder="none"></iframe>
+</div>
+
+<div id="idWarning">
+    Vous avez 1 minute pour bouger la souris, ensuite, mode veille
+</div>
+
+<script type="application/javascript" src="fullscreen.js"></script>
+<script type="application/javascript" src="clock.js"></script>
+<script type="application/javascript" src="xplanet.js"></script>
+<script type="application/javascript" src="gallery.js"></script>
+<script type="application/javascript" src="sleep_mode.js"></script>
+<!--script type="application/javascript" src="music_remote.js"></script-->
+
+</body>
+
+</html>

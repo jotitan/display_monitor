@@ -1,0 +1,7 @@
+#To build for another plateform, windows xp for instance :
+
+set GOOS=windows
+set GOARCH=386
+
+set GOPATH=project_folder
+go build -o displayer.exe main
