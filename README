@@ -1,4 +1,32 @@
-#To build for another plateform, windows xp for instance :
+h2. Description
+
+Display monitor it's a local project to re use an old 24" screen and old laptop with win xp.
+The website provide many components :
+* a gallery with rolling pictures in folders
+* the time and date
+* an earth and moon representations computed with xplanet
+* a widget meteo
+* a specific music remote controller (other project music_server)
+
+h2. Requirements
+
+This project use xplanet and nircmd.exe to manipulate windows system like screen turn off and volume controller.
+The code is written in go, download golang to compile it.
+
+h2. Launch
+
+To launch the project, you have to specifiy some options :
+* -config : folder where config files for xplanet are and default images
+* -app : folder where xplanet are
+* -gallery : where folders photo are. One sublevel parse
+* -generated : temp folder where xplanet pictures are generated
+* -port : launch port
+* -resources : where web resources are placed
+
+Nobody use this project but if you're interested to, say it to me and I will document everything
+
+
+h3. To build for another plateform, windows xp for instance :
 
 set GOOS=windows
 set GOARCH=386
