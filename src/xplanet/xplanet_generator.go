@@ -159,7 +159,7 @@ func (xp XPlanet)GeneratesForOneHour(datePrefix string) {
 		xp.Generate(filename,fmt.Sprintf("%s%s%d00",datePrefix,pad,minutes))
 	}
 	// Generate animate image
-	xp.GenerateManyAngle("tmp_gif_" + hour,xp.GenerateName("gif",hour),0,360,5,true,fmt.Sprintf("%s00",hour))
+	xp.GenerateManyAngle("tmp_gif_" + hour,xp.GenerateName("gif",hour),0,360,5,true,fmt.Sprintf("%s%s0000",datePrefix[:9],hour))
 }
 
 func (xp XPlanet)GenerateName(typeImage,date string)string{

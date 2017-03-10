@@ -66,6 +66,14 @@ body {
         color:white;
         cursor:pointer;
     }
+
+    .moonLeft {
+        left:5px;
+    }
+
+    .moonRight {
+        right:10px;
+    }
 </style>
 <!-- TODO : levee et coucher de soleil / lune. Sondes -->
 
@@ -90,7 +98,20 @@ body {
 
       <div class="planet" style="text-align:center">
           <img src="" class="earth" style="width:95%"/>
-          <img src="" class="moon" style="width:75%"/>
+          <!--div style="width:75%;text-align:center"-->
+          <div style="width:100%;position:relative">
+              <img src="" class="moon" style="width:75%"/>
+              <span style="position:absolute;color:white" class="moonrise moonleft">
+                  <span>Lever - </span>
+                  <span class="clock"></span>
+              </span>
+              <span style="position:absolute;color:white" class="moonset moonright">
+                  <span>Coucher - </span>
+                  <span class="clock"></span>
+              </span>
+          </div>
+
+          <!--/div-->
       </div>
    </div>
 <div style="position:absolute;bottom:0px;right:0px;width:20%;" class="meteo">
@@ -122,6 +143,7 @@ body {
 </div>
 
 <script type="application/javascript" src="fullscreen.js"></script>
+<script type="application/javascript" src="suncalc.js"></script>
 <script type="application/javascript" src="clock.js"></script>
 <script type="application/javascript" src="xplanet.js"></script>
 <script type="application/javascript" src="gallery.js"></script>
