@@ -25,6 +25,7 @@ var XPlanet = {
         var d = new Date();
         // Animate case at hour begin
         if(d.getMinutes() == 0){
+            console.log("Show hour")
             var imgSrc = "/image?format=gif&planet=earth&date=" + Clock._pad(d.getHours()) + "&rand=" + Math.random();
             this.earth.attr("src",imgSrc);
             // Change animate to fixe after one minute
@@ -74,6 +75,9 @@ var XPlanet = {
         $('div.planet span.' + right).removeClass("moonleft").addClass("moonright");
     },
     _formatTime:function(date){
-        return date.getHours() + "h" + date.getMinutes();
+        if(date == null){
+            return "";
+        }
+        return (date.getHours()< 10?"0":"") + date.getHours() + "h" + (date.getMinutes() < 10 ? "0":"") + date.getMinutes();
     }
 }.autoInit();
