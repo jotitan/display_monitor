@@ -7,7 +7,7 @@ var Weather = {
     },
     init:function(){
         var _self = this;
-        TimeEventManager.add(PatternManager.everyMinute(),function(){_self.load();},true);
+        TimeEventManager.add(PatternManager.every10Minutes(),function(){_self.load();},true);
     },
     load:function(){
         var url = 'http://api.wunderground.com/api/59cf54a22178a143/conditions/q/CA/pws:IVAIRESS3.json';
