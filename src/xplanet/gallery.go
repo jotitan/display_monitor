@@ -95,6 +95,7 @@ func (rolling RollingFoldersGallery)FindFolders(){
 	allFolders := make([]folder,0)
 	rootDir,err := os.Open(rolling.root)
 	if err != nil {
+		logger.GetLogger().Error("Wait for relaunch parse folder",err.Error())
 		// Maybe mounting does not already exist...wait one minute before relaunch
 		time.Sleep(time.Minute)
 		// Relaunch
