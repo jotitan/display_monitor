@@ -19,6 +19,7 @@ type GalleryManager interface {
 	Change(folder string)
 	//
 	GetFolderName()string
+	FindFolders()
 }
 
 type FolderGallery struct{
@@ -47,6 +48,8 @@ func (f FolderGallery)GetFolderName()string{
 	return ""
 }
 
+func (f FolderGallery)FindFolders(){}
+
 func (f FolderGallery)Get()(string,error){
 	if f.nbPictures == 0 {
 		return "",errors.New("Empty folder")
@@ -70,41 +73,59 @@ type folder struct {
 
 type RollingFoldersGallery struct{
 	root string
-	folders []folder
+	folders * []folder
 	currentGallery * currentSubGallery
 }
 
 func NewRollingFoldersGallery(root string)RollingFoldersGallery {
 	begin := time.Now()
-	rolling := RollingFoldersGallery{root:root,folders:make([]folder,0),currentGallery:&currentSubGallery{}}
-	rootDir,_ := os.Open(root)
+	folders := make([]folder,0)
+	rolling := RollingFoldersGallery{root:root,folders:&folders,currentGallery:&currentSubGallery{}}
+	rolling.FindFolders()
+
+	// Select randomly a folder
+	rolling.loadFolder()
+	logger.GetLogger().Info("Loading time :",time.Now().Sub(begin))
+	logger.GetLogger().Info(rolling.folders)
+	return rolling
+}
+
+/** Search all folders in root folder */
+func (rolling RollingFoldersGallery)FindFolders(){
+	allFolders := make([]folder,0)
+	rootDir,err := os.Open(rolling.root)
+	if err != nil {
+		// Maybe mounting does not already exist...wait one minute before relaunch
+		time.Sleep(time.Minute)
+		// Relaunch
+		if rootDir,err = os.Open(rolling.root) ; err != nil {
+			return
+		}
+	}
 	defer rootDir.Close()
 	folders,_ := rootDir.Readdir(-1)
 	for _,fol := range folders {
 		if fol.IsDir() {
 			// Parse sub folder if exist, only one level
-			fDir,_ := os.Open(filepath.Join(root,fol.Name()))
+			fDir,_ := os.Open(filepath.Join(rolling.root,fol.Name()))
 			files,_ := fDir.Readdir(-1)
 			haveImages := false
 			for _,f := range files {
 				// If also a folder,
 				if f.IsDir() {
 					name := formatFolderName(fol.Name()) + " - " + formatFolderName(f.Name())
-					rolling.folders = append(rolling.folders,folder{filepath.Join(fol.Name(),f.Name()),name})
+					allFolders = append(allFolders,folder{filepath.Join(fol.Name(),f.Name()),name})
 				} else{
 					haveImages = true
 				}
 			}
 			if haveImages {
-				rolling.folders = append(rolling.folders, folder{fol.Name(),formatFolderName(fol.Name())})
+				allFolders = append(allFolders, folder{fol.Name(),formatFolderName(fol.Name())})
 			}
 		}
 	}
-	// Select randomly a folder
-	rolling.loadFolder()
-	logger.GetLogger().Info("Loading time :",time.Now().Sub(begin))
-	logger.GetLogger().Info(rolling.folders)
-	return rolling
+	*rolling.folders = allFolders
+	logger.GetLogger().Info("Found",len(*rolling.folders),"folders")
 }
 
 func (rolling RollingFoldersGallery)Get()(string,error){
@@ -134,11 +155,12 @@ func (rolling RollingFoldersGallery)GetFolderName()string{
 }
 
 func (rolling * RollingFoldersGallery)loadFolder(){
-	if len(rolling.folders) == 0 {
+	if len(*rolling.folders) == 0 {
 		return
 	}
-	position := int(random.Int31()) % len(rolling.folders)
-	selectedFolder := filepath.Join(rolling.root,rolling.folders[position].path)
+	folders := *rolling.folders
+	position := int(random.Int31()) % len(folders)
+	selectedFolder := filepath.Join(rolling.root,folders[position].path)
 	fol,_ := os.Open(selectedFolder)
 	files,_ := fol.Readdir(-1)
 	filteredFiles := make([]string,0,len(files))
@@ -153,5 +175,5 @@ func (rolling * RollingFoldersGallery)loadFolder(){
 		return
 	}
 	logger.GetLogger().Info("Select gallery folder",selectedFolder)
-	*(rolling.currentGallery) = currentSubGallery{folder:folder{selectedFolder,rolling.folders[position].name},position:0,files:filteredFiles}
+	*(rolling.currentGallery) = currentSubGallery{folder:folder{selectedFolder,folders[position].name},position:0,files:filteredFiles}
 }

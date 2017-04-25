@@ -35,6 +35,10 @@ func (s Server)getFolderName(response http.ResponseWriter, request *http.Request
 	response.Write([]byte(s.galleryManager.GetFolderName()))
 }
 
+func (s Server)findFolders(response http.ResponseWriter, request *http.Request) {
+	s.galleryManager.FindFolders()
+}
+
 func extractRequesterHost(request *http.Request)string{
 	if !strings.Contains(request.Host,":"){
 		return request.Host
@@ -101,6 +105,7 @@ func (s Server)Launch(port string){
 	smux.HandleFunc("/image",s.getImage)
 	smux.HandleFunc("/change",s.change)
 	smux.HandleFunc("/getFolderName",s.getFolderName)
+	smux.HandleFunc("/findFolders",s.findFolders)
 	smux.HandleFunc("/turnOn",s.turnOn)
 	smux.HandleFunc("/turnOff",s.turnOff)
 	smux.HandleFunc("/",s.root)
