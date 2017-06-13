@@ -19,6 +19,9 @@ var XPlanet = {
         var _self = this;
         TimeEventManager.add(PatternManager.every10Minutes(),function(){_self.setEarth();},true);
         TimeEventManager.add(PatternManager.everyHours(),function(){_self.setMoon();},true);
+        this.earth.bind('click',function(){
+            Gallery.changeGalleryType();
+        });
     },
     // Load image of earth and display. Use local time (round floor to 10 minutes)
     setEarth:function(){

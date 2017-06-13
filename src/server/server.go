@@ -13,7 +13,10 @@ import (
 
 type Server struct {
 	webFolder string
-	galleryManager xplanet.GalleryManager
+	// store the current manager of gallery (rolling folder or flickr)
+	currentGalleryManager * xplanet.GalleryManager
+	flickrManager *xplanet.GalleryManager
+	galleryManager *xplanet.GalleryManager
 	xPlanetManagerEarth xplanet.XPlanet
 	xPlanetManagerMoon xplanet.XPlanet
 }
@@ -26,17 +29,31 @@ func (s Server)getPlanetManager(planet string)*xplanet.XPlanet{
 	}
 }
 
-
-func (s Server)change(response http.ResponseWriter, request *http.Request) {
-	s.galleryManager.Change(request.FormValue("folder"))
+func (s Server)getCurrentGallery()xplanet.GalleryManager{
+	g := *(s.currentGalleryManager)
+	return g
 }
 
-func (s Server)getFolderName(response http.ResponseWriter, request *http.Request) {
-	response.Write([]byte(s.galleryManager.GetFolderName()))
+func (s Server)change(response http.ResponseWriter, request *http.Request) {
+	s.getCurrentGallery().Change(request.FormValue("folder"))
+}
+
+func (s * Server)changeGallery(response http.ResponseWriter, request *http.Request) {
+	if strings.Contains(strings.ToLower(s.getCurrentGallery().Name()),"flickr") {
+		s.currentGalleryManager = s.galleryManager
+	}else{
+		s.currentGalleryManager = s.flickrManager
+	}
+	logger.GetLogger2().Info("Change to gallery",s.getCurrentGallery().Name())
+}
+
+func (s * Server)getFolderName(response http.ResponseWriter, request *http.Request) {
+	response.Write([]byte(s.getCurrentGallery().GetFolderName()))
+	response.Write([]byte(s.getCurrentGallery().GetFolderName()))
 }
 
 func (s Server)findFolders(response http.ResponseWriter, request *http.Request) {
-	s.galleryManager.FindFolders()
+	s.getCurrentGallery().FindFolders()
 }
 
 func extractRequesterHost(request *http.Request)string{
@@ -66,7 +83,7 @@ func (s Server)turnOff(response http.ResponseWriter, request *http.Request) {
 
 //getImage return an image of xplanet
 // Precise 3 parameter : planet (earth, moon), format (gif, jpeg), hour
-func (s Server)getImage(response http.ResponseWriter, request *http.Request) {
+func (s *Server)getImage(response http.ResponseWriter, request *http.Request) {
 	if xPlanet := s.getPlanetManager(request.FormValue("planet")); xPlanet != nil {
 		format := request.FormValue("format")
 		filename := xPlanet.GenerateName(format, request.FormValue("date"))
@@ -79,10 +96,17 @@ func (s Server)getImage(response http.ResponseWriter, request *http.Request) {
 		}
 	}else{
 		// Random image case, return image in folder
-		if filename,err := s.galleryManager.Get() ; err == nil {
-			f,_:= os.Open(filename)
-			defer f.Close()
-			io.Copy(response,f)
+		if filename,err := s.getCurrentGallery().Get() ; err == nil {
+			// Http case
+			if strings.HasPrefix(filename,"http") {
+				if resp,err := http.Get(filename) ; err == nil {
+					io.Copy(response,resp.Body)
+				}
+			}else {
+				f, _ := os.Open(filename)
+				defer f.Close()
+				io.Copy(response, f)
+			}
 		}
 	}
 }
@@ -104,6 +128,7 @@ func (s Server)Launch(port string){
 	}
 	smux.HandleFunc("/image",s.getImage)
 	smux.HandleFunc("/change",s.change)
+	smux.HandleFunc("/changeGallery",s.changeGallery)
 	smux.HandleFunc("/getFolderName",s.getFolderName)
 	smux.HandleFunc("/findFolders",s.findFolders)
 	smux.HandleFunc("/turnOn",s.turnOn)
@@ -120,8 +145,13 @@ func New(webFolder string,xpEarth xplanet.XPlanet,xpMoon xplanet.XPlanet,gallery
 	if strings.HasPrefix(gallery,"http"){
 		// Rest case
 	}else{
-		s.galleryManager = xplanet.NewRollingFoldersGallery(gallery)
-		//s.galleryManager = xplanet.NewFolderGallery(gallery)
+		rfg := xplanet.GalleryManager(xplanet.NewRollingFoldersGallery(gallery))
+		fg := xplanet.GalleryManager(xplanet.NewFlickrGallery())
+		s.galleryManager = &rfg
+		s.flickrManager = &fg
+		// By default, gallery is rolling folders
+		s.currentGalleryManager = s.galleryManager
+
 	}
 	return s
 }

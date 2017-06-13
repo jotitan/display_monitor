@@ -31,6 +31,9 @@ var Gallery = {
     changeFolder:function(){
         $.ajax({url:'/change',success:function(){Gallery.loadFolderName();}});
     },
+    changeGalleryType:function(){
+      $.ajax({url:'/changeGallery',success:function(){Gallery.loadFolderName();}});
+    },
     loadFolderName:function(){
         $.ajax({url:'/getFolderName',success:function(data){$('.folderName').html(data)}});
     },

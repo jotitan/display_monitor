@@ -12,6 +12,7 @@ import (
 
 var random = rand.New(rand.NewSource(time.Now().UnixNano()))
 
+// interface to implement to create a new gallery manager
 type GalleryManager interface {
 	// return a random image
 	Get()(string,error)
@@ -20,6 +21,7 @@ type GalleryManager interface {
 	//
 	GetFolderName()string
 	FindFolders()
+	Name()string
 }
 
 type FolderGallery struct{
@@ -46,6 +48,10 @@ func (f FolderGallery)Change(folder string){
 
 func (f FolderGallery)GetFolderName()string{
 	return ""
+}
+
+func (f FolderGallery)Name()string{
+	return "Folder"
 }
 
 func (f FolderGallery)FindFolders(){}
@@ -77,6 +83,7 @@ type RollingFoldersGallery struct{
 	currentGallery * currentSubGallery
 }
 
+// Add option to reload folders sometimes
 func NewRollingFoldersGallery(root string)RollingFoldersGallery {
 	begin := time.Now()
 	folders := make([]folder,0)
@@ -88,6 +95,10 @@ func NewRollingFoldersGallery(root string)RollingFoldersGallery {
 	logger.GetLogger().Info("Loading time :",time.Now().Sub(begin))
 	logger.GetLogger().Info(rolling.folders)
 	return rolling
+}
+
+func (rolling RollingFoldersGallery)Name()string{
+	return "Rolling folders gallery"
 }
 
 /** Search all folders in root folder */
