@@ -11,7 +11,7 @@ import (
 // Get randomly some flickr pictures
 // Implement GalleryManager
 
-var baseFlickrUrl = "https://api.flickr.com/v2/media/search?query={tag}&orderBy=interestingness&pageNumber={page}&pageSize=50&format=json"
+var baseFlickrUrl = "http://api.flickr.com/v2/media/search?query={tag}&orderBy=interestingness&pageNumber={page}&pageSize=50&format=json"
 
 var tags = []string{"water","nature","beach","sunset","sky","night","landscape","clouds","sun","lake","bridge"}
 
