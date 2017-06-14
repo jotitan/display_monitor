@@ -6,6 +6,7 @@ import (
     "io/ioutil"
     "fmt"
     "logger"
+    "math/rand"
 )
 
 // Get randomly some flickr pictures
@@ -13,7 +14,7 @@ import (
 
 var baseFlickrUrl = "http://api.flickr.com/v2/media/search?query={tag}&orderBy=interestingness&pageNumber={page}&pageSize=50&format=json"
 
-var tags = []string{"water","nature","beach","sunset","sky","night","landscape","clouds","sun","lake","bridge"}
+var tags = []string{"water","nature","beach","sunset","sky","night","landscape","clouds","sun","lake","bridge","waves","river","park"}
 
 type FlickrGallery struct{
     // Tag actually display
@@ -51,7 +52,8 @@ func (fg FlickrGallery) Get()(string,error){
 }
 
 func (fg FlickrGallery)Change(folder string){
-    *fg.currentTag = (*fg.currentTag+1) % len(tags)
+    // Take a random tag
+    *fg.currentTag = rand.Int()%len(tags)
     // Restart at first page
     *fg.page = 0
     fg.FindFolders()
