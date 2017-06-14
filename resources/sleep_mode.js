@@ -115,12 +115,15 @@ var Sleeper = {
             }
         }.init();
         $('#idWarning').unbind('mousemove').bind('mousemove',function(e){
-            if(this.x != null && this.y != null && (this.x != e.clientX || this.y != e.clientY)){
+            if(this._detectMove()){
                 context.move();
             }
             this.x = e.clientX;
             this.y = e.clientY;
         });
+    },
+    _detectMove:function(){
+        return this.x != null && this.y != null && (this.x != e.clientX || this.y != e.clientY);
     },
     sleep:function(sleepTime){
         sleepTime = sleepTime || this.ranges.sleepDuration
@@ -131,7 +134,7 @@ var Sleeper = {
         // Detect mouse move on screen
         $('.gallery').unbind('mousemove').bind('mousemove',function(e){
             // Wake up sleep
-            if(this.x != null && this.y != null && (this.x != e.clientX || this.y != e.clientY)){
+            if(this._detectMove()){
                 $('#idWarning').hide();
                 $('.gallery').unbind('mousemove');
                 // Wake up only 30 minutes and ask again if necessary. Compute if after 30 minutes, has to sleep
