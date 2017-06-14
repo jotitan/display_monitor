@@ -159,7 +159,7 @@ func (xp XPlanet)GeneratesForOneHour(datePrefix string) {
 		xp.Generate(filename,fmt.Sprintf("%s%s%d00",datePrefix,pad,minutes))
 	}
 	// Generate animate image
-	xp.GenerateManyAngle("tmp_gif_" + hour,xp.GenerateName("gif",hour),0,360,5,true,fmt.Sprintf("%s%s0000",datePrefix[:9],hour))
+	xp.GenerateManyAngle("tmp_gif_" + hour,xp.GenerateName("gif",hour),5,true,fmt.Sprintf("%s%s0000",datePrefix[:9],hour))
 }
 
 func (xp XPlanet)GenerateName(typeImage,date string)string{
@@ -183,7 +183,9 @@ func (xp XPlanet)Generate(filename,date string){
 	//xplanet.exe -config ../config.conf  -geometry 1600x1200 -output ../out.jpg -date 20161018.190000
 }
 
-func (xp XPlanet)GenerateManyAngle(prefix,filename string,angleFrom,angleTo, step int,onlyGif bool,date string){
+func (xp XPlanet)GenerateManyAngle(prefix,filename string, step int,onlyGif bool,date string){
+	angleFrom := 0
+	angleTo := 360
 	begin := time.Now()
 	nbMax :=int(math.Abs(float64(angleTo - angleFrom))) / step
 	nb := 0
