@@ -34,7 +34,7 @@ func (s Server)getCurrentGallery()xplanet.GalleryManager{
 	return g
 }
 
-func (s Server)change(response http.ResponseWriter, request *http.Request) {
+func (s * Server)change(response http.ResponseWriter, request *http.Request) {
 	s.getCurrentGallery().Change(request.FormValue("folder"))
 }
 
@@ -52,7 +52,7 @@ func (s * Server)getFolderName(response http.ResponseWriter, request *http.Reque
 	response.Write([]byte(s.getCurrentGallery().GetFolderName()))
 }
 
-func (s Server)findFolders(response http.ResponseWriter, request *http.Request) {
+func (s * Server)findFolders(response http.ResponseWriter, request *http.Request) {
 	s.getCurrentGallery().FindFolders()
 }
 
@@ -85,28 +85,37 @@ func (s Server)turnOff(response http.ResponseWriter, request *http.Request) {
 // Precise 3 parameter : planet (earth, moon), format (gif, jpeg), hour
 func (s *Server)getImage(response http.ResponseWriter, request *http.Request) {
 	if xPlanet := s.getPlanetManager(request.FormValue("planet")); xPlanet != nil {
-		format := request.FormValue("format")
-		filename := xPlanet.GenerateName(format, request.FormValue("date"))
-		if f, err := os.Open(filename); err != nil {
-			http.Error(response, "Image not found", 404)
-		}else {
-			defer f.Close()
-			response.Header().Add("Content-Type", "image/" + format)
-			io.Copy(response, f)
-		}
+		s.loadPlanet(response,xPlanet,request.FormValue("date"),request.FormValue("format"))
 	}else{
-		// Random image case, return image in folder
-		if filename,err := s.getCurrentGallery().Get() ; err == nil {
-			// Http case
-			if strings.HasPrefix(filename,"http") {
-				if resp,err := http.Get(filename) ; err == nil {
-					io.Copy(response,resp.Body)
-				}
-			}else {
-				f, _ := os.Open(filename)
-				defer f.Close()
-				io.Copy(response, f)
+		s.loadImage(response)
+	}
+}
+
+func (s * Server)loadPlanet(response http.ResponseWriter,xPlanet *xplanet.XPlanet, date, format string){
+	// Random image case, return image in folder
+	filename := xPlanet.GenerateName(format, date)
+	if f, err := os.Open(filename); err != nil {
+		http.Error(response, "Image not found", 404)
+	}else {
+		defer f.Close()
+		response.Header().Add("Content-Type", "image/" + format)
+		io.Copy(response, f)
+	}
+}
+
+// return image from gallery
+func (s * Server)loadImage(response http.ResponseWriter){
+	// Random image case, return image in folder
+	if filename,err := s.getCurrentGallery().Get() ; err == nil {
+		// Http case
+		if strings.HasPrefix(filename,"http") {
+			if resp,err := http.Get(filename) ; err == nil {
+				io.Copy(response,resp.Body)
 			}
+		}else {
+			f, _ := os.Open(filename)
+			defer f.Close()
+			io.Copy(response, f)
 		}
 	}
 }
