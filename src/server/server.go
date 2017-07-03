@@ -8,6 +8,7 @@ import (
 	"io"
 	"logger"
 	"strings"
+	"fmt"
 )
 //
 
@@ -48,7 +49,6 @@ func (s * Server)changeGallery(response http.ResponseWriter, request *http.Reque
 }
 
 func (s * Server)getFolderName(response http.ResponseWriter, request *http.Request) {
-	response.Write([]byte(s.getCurrentGallery().GetFolderName()))
 	response.Write([]byte(s.getCurrentGallery().GetFolderName()))
 }
 
@@ -144,7 +144,7 @@ func (s Server)Launch(port string){
 	smux.HandleFunc("/turnOff",s.turnOff)
 	smux.HandleFunc("/",s.root)
 
-	logger.GetLogger().Info("server is well loaded on " + port)
+	logger.GetLogger().Info(fmt.Sprintf("server is well loaded on %s (%v)",port,s.xPlanetManagerEarth.GenerateAsync))
 	// launch server
 	http.ListenAndServe(":" + port,smux)
 }

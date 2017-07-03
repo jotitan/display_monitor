@@ -18,11 +18,12 @@ func main() {
 	app := args.GetMandatoryString("app", "need to specify the xplanet app folder with option -app")
 	generateFolder := args.GetMandatoryString("generated","need to specify output folder with option -generated")
 	configFolder := args.GetMandatoryString("config","need to specify config folder with option -config")
+	asyncGeneration := ! (args.GetString("sync") == "true")
 	galleryParam := args.GetString("gallery")
 	webFolder := args.GetMandatoryString("resources","need to specify web resources folder with option -resources")
 
-	xp := xplanet.New(app,filepath.Join(configFolder,"earth.conf"),generateFolder,"earth","48","3",600,600)
-	xpMoon := xplanet.New(app,filepath.Join(configFolder,"moon.conf"),generateFolder,"moon","0","0",400,400)
+	xp := xplanet.New(app,filepath.Join(configFolder,"earth.conf"),generateFolder,"earth","48","3",600,600,asyncGeneration)
+	xpMoon := xplanet.New(app,filepath.Join(configFolder,"moon.conf"),generateFolder,"moon","0","0",400,400,asyncGeneration)
 
 	// Used to be sure to load cloud image before launching generation
 	ackFirstGeneration := make(chan struct{}	,1)

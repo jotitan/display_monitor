@@ -28,6 +28,8 @@ type XPlanet struct {
 	// prefix of all generated images
 	prefix string
 	folder string
+	// If true, generate gif and xplanet image in parallel
+	GenerateAsync bool
 }
 
 const (
@@ -38,8 +40,8 @@ const (
 // config : path of config to generate images
 // folder : where to put generated images
 // target : name of the target planet
-func New(appPath,config,folder,target string, latitude,longitude string,width,height int)XPlanet{
-	xp := XPlanet{AppPath:appPath,ConfigPath:config,prefix:target,folder:folder}
+func New(appPath,config,folder,target string, latitude,longitude string,width,height int, generateAsync bool)XPlanet{
+	xp := XPlanet{AppPath:appPath,ConfigPath:config,prefix:target,folder:folder,GenerateAsync:generateAsync}
 	xp.DefaultParameter = []string{"-radius","40","-range","1000","-num_times","1","-target",target,"-quality","95","-geometry",fmt.Sprintf("%dx%d",width,height)}
 	xp.Coordinates = []string{"-latitude",latitude,"-longitude",longitude}
 	return xp
@@ -159,7 +161,7 @@ func (xp XPlanet)GeneratesForOneHour(datePrefix string) {
 		xp.Generate(filename,fmt.Sprintf("%s%s%d00",datePrefix,pad,minutes))
 	}
 	// Generate animate image
-	xp.GenerateManyAngle("tmp_gif_" + hour,xp.GenerateName("gif",hour),5,true,fmt.Sprintf("%s%s0000",datePrefix[:9],hour))
+	xp.GenerateManyAngle("tmp_gif_" + hour,xp.GenerateName("gif",hour),5,true,fmt.Sprintf("%s%s0000",datePrefix[:9],hour) )
 }
 
 func (xp XPlanet)GenerateName(typeImage,date string)string{
@@ -203,7 +205,12 @@ func (xp XPlanet)GenerateManyAngle(prefix,filename string, step int,onlyGif bool
 		cmd := exec.Command(xp.AppPath + ".exe",params...)
 		cmd.Run()
 		if onlyGif {
-			go func(name string,pos int){generateGif.TreatGif(name,pos)}(filename,nb)
+			if xp.GenerateAsync {
+				go func(name string, pos int) {generateGif.TreatGif(name, pos)}(filename, nb)
+			}else{
+				// If no async, launch gif integration and wait before launching new xplanet
+				generateGif.TreatGif(filename, nb)
+			}
 		}
 		nb++
 	}
