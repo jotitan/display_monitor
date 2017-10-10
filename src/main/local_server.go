@@ -35,25 +35,24 @@ func main() {
 }
 
 func turnOff(response http.ResponseWriter, request *http.Request) {
-	turnOff := exec.Command(nirCmdPath,"monitor","off")
-	turnOff.Run()
-
-	volumeOff := exec.Command(nirCmdPath,"mutesysvolume","1")
-	volumeOff.Run()
+	execCmd("monitor","off")
+	execCmd("mutesysvolume","1")
 }
 
 func turnOn(response http.ResponseWriter, request *http.Request) {
-	turnOff := exec.Command(nirCmdPath,"monitor","on")
-	turnOff.Run()
-
-	volumeOff := exec.Command(nirCmdPath,"mutesysvolume","0")
-	volumeOff.Run()
+	execCmd("monitor","on")
+	execCmd("mutesysvolume","0")
 }
 
 func volumeUp(response http.ResponseWriter, request *http.Request) {
-	exec.Command(nirCmdPath,"changesysvolume","6500").Run()
+	execCmd("changesysvolume","6500")
 }
 
 func volumeDown(response http.ResponseWriter, request *http.Request) {
-	exec.Command(nirCmdPath,"changesysvolume","-6500").Run()
+	execCmd("changesysvolume","-6500")
+}
+
+func execCmd(command,value string){
+	logger.GetLogger2().Info("Exec",command,"with",value)
+	exec.Command(nirCmdPath,command,value).Run()
 }

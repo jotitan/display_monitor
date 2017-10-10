@@ -141,6 +141,12 @@ func (rolling RollingFoldersGallery)FindFolders(){
 }
 
 func (rolling RollingFoldersGallery)Get()(string,error){
+	defer func(){
+		// Catch error
+		if err := recover() ; err != nil {
+			logger.GetLogger2().Error("Error when get image",err,rolling.currentGallery.folder.path,rolling.currentGallery.position,len(rolling.currentGallery.files))
+		}
+	}()
 	if rolling.currentGallery == nil {
 		return "",errors.New("Impossible, no photo here")
 	}
